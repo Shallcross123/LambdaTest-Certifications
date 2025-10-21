@@ -1,0 +1,55 @@
+Write a Parallel Selenium Test (Python)
+
+Below is a sample test_lambdatest.py that runs on the LambdaTest Selenium Grid in parallel:
+
+import pytest
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+import os
+
+USERNAME = os.getenv("LT_USERNAME") or "your_lambdatest_username"
+ACCESS_KEY = os.getenv("LT_ACCESS_KEY") or "your_lambdatest_access_key"
+GRID_URL = f"https://{USERNAME}:{ACCESS_KEY}@hub.lambdatest.com/wd/hub"
+
+capabilities = [
+    {
+        "browserName": "Chrome",
+        "browserVersion": "latest",
+        "LT:Options": {
+            "platformName": "Windows 11",
+            "build": "LambdaTest Python Parallel Build",
+            "name": "Chrome_Test",
+            "video": True,
+            "network": True,
+            "console": True,
+            "visual": True,
+        },
+    },
+    {
+        "browserName": "Firefox",
+        "browserVersion": "latest",
+        "LT:Options": {
+            "platformName": "macOS Sonoma",
+            "build": "LambdaTest Python Parallel Build",
+            "name": "Firefox_Test",
+            "video": True,
+            "network": True,
+            "console": True,
+            "visual": True,
+        },
+    },
+]
+
+@pytest.mark.parametrize("capability", capabilities)
+def test_parallel_lambdatest(capability):
+    driver = webdriver.Remote(
+        command_executor=GRID_URL,
+        desired_capabilities=capability
+    )
+
+    driver.get("https://www.lambdatest.com")
+    title = driver.title
+    assert "LambdaTest" in title, f"Title mismatch: {title}"
+
+    driver.quit()
+
